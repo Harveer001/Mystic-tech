@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kalyan Connection — Emergency Health Helper (Prototype)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1><span class="brand-dot"></span> Kalyan Connection <small style="font-size:12px;color:var(--muted);margin-left:4px;">(Prototype)</small></h1>
+  <div class="controls">
+    <select id="lang" class="pill" aria-label="Language">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="raj">Rajasthani</option>
+      <option value="bn">বাংলা</option>
+    </select>
+    <div class="login-area">
+      <div id="userDisplay" class="small" style="margin-right:8px;">Not logged in</div>
+      <button id="btnLogin" class="btn">Login/Register</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <div class="card">
+      <div class="top-row">
+        <div>
+          <label id="lblHealth" for="healthIssue">Health Issue</label>
+          <select id="healthIssue">
+            <option value="heart">Heart Pain / Chest</option>
+            <option value="injury">Injury / Bleeding</option>
+            <option value="fever">Fever / Infection</option>
+            <option value="pregnancy">Pregnancy Emergency</option>
+            <option value="asthma">Breathing / Asthma</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label id="lblBudget" for="sortSelect">Sort results</label>
+        <select id="sortSelect">
+          <option value="distance">Nearest (distance)</option>
+          <option value="budget">Budget (low fee)</option>
+        </select>
+      </div>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <button id="sendRequest" class="btn" style="flex:1">Send Emergency Request</button>
+        <button id="useLocation" class="pill" title="Fetch current location">📍</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>Nearby Medicine Finder</label>
+        <div id="medicineList" class="small">No search yet</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <label>Emergency Helplines</label>
+      <div class="helplines" style="margin-top:8px;">
+        <button onclick="location.href='tel:108'">🚑 108 Ambulance</button>
+        <button onclick="location.href='tel:112'">📞 112 Emergency</button>
+        <button onclick="location.href='tel:104'">🏥 104 Health Helpline</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>First Aid Quick Guide</label>
+        <div class="first-aid-list" style="margin-top:10px;">
+          <div class="first-aid-item"><strong id="fa-title-bleed">Bleeding</strong><div class="small" id="fa-bleed">Apply pressure over wound; raise limb; seek help.</div></div>
+          <div class="first-aid-item"><strong id="fa-title-choke">Choking</strong><div class="small" id="fa-choke">Encourage coughing; back blows; Heimlich maneuver for adults.</div></div>
+          <div class="first-aid-item"><strong id="fa-title-burn">Burns</strong><div class="small" id="fa-burn">Cool with running water for 10 mins; cover with cling film; don't apply oil.</div></div>
+          <div class="first-aid-item"><strong id="fa-title-heart">Suspected Heart Attack</strong><div class="small" id="fa-heart">Call ambulance; make person sit; loosen clothing; give aspirin if not allergic.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Map (simulated)</label>
+      <div class="map-sim" id="mapSim">Map preview — enables when location allowed</div>
+      <div class="small" style="margin-top:8px;">Tip: allow location permission and then click <strong>Send Emergency Request</strong>.</div>
+    </div>
+  </aside>
+
+  <section>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2 id="resultsTitle" style="margin:0 0 6px 0;">Search results</h2>
+          <div class="small" id="resultsSubtitle">No search yet</div>
+        </div>
+        <div>
+          <button id="toggleView" class="pill">Toggle Hospital/Doctor</button>
+        </div>
+      </div>
+
+      <div id="results" class="results-list" style="margin-top:12px;">
+        <!-- results injected here -->
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <label>Selected Entity Details</label>
+      <div id="details" style="margin-top:10px;">
+        <div class="small">Click a result to see details.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <label>Profile / Document</label>
+      <div class="small">Open the login/register modal to edit basic info or use the profile panel below (saved locally).</div>
+
+      <div id="docView" style="display:none;">
+        <h3>Personal Document</h3>
+        <div class="doc-row"><div class="doc-col"><strong>Name:</strong> <span id="doc_name"></span></div><div class="doc-col"><strong>Phone:</strong> <span id="doc_phone"></span></div></div>
+        <div class="doc-row"><div class="doc-col"><strong>Date of Birth:</strong> <span id="doc_dob"></span></div><div class="doc-col"><strong>Aadhaar:</strong> <span id="doc_aadhaar"></span></div></div>
+        <div class="doc-row"><div class="doc-col"><strong>Height:</strong> <span id="doc_height"></span> cm</div><div class="doc-col"><strong>Weight:</strong> <span id="doc_weight"></span> kg</div></div>
+        <div class="doc-row"><div class="doc-col"><strong>Saved on:</strong> <span id="doc_saved"></span></div></div>
+        <div>
+          <button id="printDoc" class="btn print-btn">Print / Save as PDF</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button id="openDocBtn" class="pill" disabled>Open Document</button>
+        <button id="logoutBtn" class="pill">Logout</button>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <small>Prototype — Mystic Jo bhi h · Emergency Health Helper · "Kalyan Connection"</small>
+</footer>
+
+<!-- Modal: simple login/register + extended profile fields -->
+<div id="modal">
+  <div class="modal-card">
+    <h3 style="margin:0 0 8px 0;">Login / Register / Profile</h3>
+    <div class="small" style="margin-bottom:8px;">This demo stores basic info locally (no server).</div>
+
+    <label>Name</label>
+    <input id="inpName" type="text" placeholder="Your name"/>
+
+    <label style="margin-top:8px;">Phone</label>
+    <input id="inpPhone" type="text" placeholder="Phone number"/>
+
+    <label style="margin-top:8px;">Aadhaar (optional)</label>
+    <input id="inpAadhaar" type="text" placeholder="Aadhaar"/>
+
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <div style="flex:1">
+        <label>Date of Birth</label>
+        <input id="inpDOB" type="date" />
+      </div>
+      <div style="flex:1">
+        <label>Height (cm)</label>
+        <input id="inpHeight" type="number" min="30" max="300" />
+      </div>
+      <div style="flex:1">
+        <label>Weight (kg)</label>
+        <input id="inpWeight" type="number" min="2" max="500" />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end;">
+      <button id="closeModal" class="pill">Cancel</button>
+      <button id="saveProfile" class="btn">Save</button>
+    </div>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
